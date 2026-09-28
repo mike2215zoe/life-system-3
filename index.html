@@ -1,0 +1,906 @@
+<title>人生系统3.0 · 初诊</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EEEDE6;
+  --surface:#FAF9F4;
+  --surface-2:#F1F0E8;
+  --ink:#22261E;
+  --ink-soft:#62655A;
+  --ink-faint:#95978A;
+  --accent:#2E5C56;
+  --accent-contrast:#F4F1E8;
+  --accent-soft:#DDE7E4;
+  --line:#DBD8CC;
+  --mind:#4C6B8A;
+  --body-q:#5E7A52;
+  --spirit:#8A5A7E;
+  --vocation:#A9772E;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B1D18;
+    --surface:#24261F;
+    --surface-2:#2B2D24;
+    --ink:#EDEBE1;
+    --ink-soft:#A9A99B;
+    --ink-faint:#787A6E;
+    --accent:#6FA89C;
+    --accent-contrast:#12211E;
+    --accent-soft:#28352F;
+    --line:#3A3C33;
+    --mind:#87A6C8;
+    --body-q:#93B683;
+    --spirit:#C494B8;
+    --vocation:#DDAD66;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B1D18;
+  --surface:#24261F;
+  --surface-2:#2B2D24;
+  --ink:#EDEBE1;
+  --ink-soft:#A9A99B;
+  --ink-faint:#787A6E;
+  --accent:#6FA89C;
+  --accent-contrast:#12211E;
+  --accent-soft:#28352F;
+  --line:#3A3C33;
+  --mind:#87A6C8;
+  --body-q:#93B683;
+  --spirit:#C494B8;
+  --vocation:#DDAD66;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  padding-inline:16px;
+  padding-block:0;
+}
+h1,h2,h3{
+  font-family:"Noto Serif SC","Songti SC",serif;
+  font-weight:700;
+  text-wrap:balance;
+  margin:0;
+}
+.tabular{font-variant-numeric:tabular-nums;}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.shell{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ---- header / progress ---- */
+.topbar{
+  position:sticky;
+  top:env(safe-area-inset-top, 0px);
+  background:var(--bg);
+  padding-top:18px;
+  padding-bottom:12px;
+  z-index:5;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+}
+.brand svg{flex:none;}
+.brand .name{
+  font-family:"Noto Serif SC",serif;
+  font-weight:600;
+  font-size:0.95rem;
+  letter-spacing:0.02em;
+}
+.brand .name em{
+  font-style:normal;
+  color:var(--accent);
+}
+.progress-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.progress-track{
+  flex:1;
+  display:flex;
+  gap:4px;
+}
+.progress-seg{
+  height:4px;
+  flex:1;
+  border-radius:2px;
+  background:var(--line);
+  transition:background .3s ease;
+}
+.progress-seg.done{background:var(--accent);}
+.progress-count{
+  font-size:0.75rem;
+  color:var(--ink-faint);
+  white-space:nowrap;
+}
+
+/* ---- main ---- */
+main{
+  flex:1;
+  padding-bottom:28px;
+}
+.step{
+  animation:rise .35s ease both;
+}
+@media (prefers-reduced-motion:reduce){.step{animation:none;}}
+@keyframes rise{
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:none;}
+}
+
+.eyebrow{
+  font-size:0.75rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:8px;
+}
+.q-title{
+  font-size:1.3rem;
+  margin-bottom:6px;
+}
+.q-help{
+  color:var(--ink-soft);
+  font-size:0.92rem;
+  margin-bottom:20px;
+  max-width:38em;
+}
+
+/* ---- cover ---- */
+.cover-title{
+  font-size:clamp(1.7rem,1.35rem + 1.4vw,2.2rem);
+  margin-bottom:14px;
+}
+.cover-lede{
+  color:var(--ink-soft);
+  font-size:1rem;
+  margin-bottom:26px;
+  max-width:34em;
+}
+.legend{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 16px;
+  margin-bottom:28px;
+}
+.legend-item{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:12px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+.legend-dot{
+  width:10px;height:10px;border-radius:50%;
+  margin-top:5px;flex:none;
+}
+.legend-item .lt{font-weight:600;font-size:0.9rem;}
+.legend-item .ld{color:var(--ink-soft);font-size:0.78rem;margin-top:2px;}
+.cover-note{
+  font-size:0.82rem;
+  color:var(--ink-faint);
+  border-top:1px solid var(--line);
+  padding-top:16px;
+}
+
+/* ---- quadrant tag ---- */
+.quad-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:5px 12px 5px 9px;
+  border-radius:999px;
+  background:var(--surface-2);
+  font-size:0.82rem;
+  font-weight:600;
+  margin-bottom:14px;
+}
+.quad-tag .dot{width:8px;height:8px;border-radius:50%;}
+.quad-def{
+  color:var(--ink-soft);
+  font-size:0.88rem;
+  margin-bottom:22px;
+  max-width:36em;
+}
+
+/* ---- slider group ---- */
+.slider-group{margin-bottom:26px;}
+.slider-group:last-child{margin-bottom:4px;}
+.slider-label-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:12px;
+  margin-bottom:3px;
+}
+.slider-label{font-weight:600;font-size:0.96rem;}
+.slider-value{
+  font-family:"Noto Serif SC",serif;
+  font-weight:700;
+  font-size:1.05rem;
+  color:var(--accent);
+  min-width:1.6em;
+  text-align:right;
+}
+.slider-help{
+  color:var(--ink-soft);
+  font-size:0.82rem;
+  margin-bottom:10px;
+}
+input[type="range"]{
+  width:100%;
+  accent-color:var(--accent);
+  height:22px;
+  cursor:pointer;
+}
+.scale-caps{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.72rem;
+  color:var(--ink-faint);
+  margin-top:2px;
+}
+
+/* ---- text inputs ---- */
+textarea,input[type="text"]{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:13px 14px;
+  font-family:inherit;
+  font-size:0.98rem;
+  color:var(--ink);
+  resize:vertical;
+}
+textarea{min-height:110px;line-height:1.6;}
+textarea::placeholder,input::placeholder{color:var(--ink-faint);}
+.field{margin-bottom:18px;}
+.field label{
+  display:block;
+  font-weight:600;
+  font-size:0.9rem;
+  margin-bottom:8px;
+}
+
+.dynamic-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px 18px;
+  margin-bottom:20px;
+}
+.dynamic-card .dc-eyebrow{
+  font-size:0.72rem;
+  color:var(--accent);
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  font-weight:700;
+}
+.dynamic-card p{margin:0;font-size:1.02rem;line-height:1.7;}
+
+/* ---- nav bar ---- */
+.navbar{
+  position:sticky;
+  bottom:0;
+  padding-top:14px;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  background:linear-gradient(to bottom, transparent, var(--bg) 28%);
+  display:flex;
+  gap:10px;
+  z-index:5;
+}
+.btn{
+  border:none;
+  border-radius:8px;
+  padding:13px 20px;
+  font-size:0.96rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:opacity .15s ease, transform .1s ease;
+}
+.btn:active{transform:scale(0.98);}
+.btn-primary{
+  background:var(--accent);
+  color:var(--accent-contrast);
+  flex:1;
+}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-ghost{
+  background:transparent;
+  color:var(--ink-soft);
+  border:1px solid var(--line);
+}
+.hint-block{
+  font-size:0.78rem;
+  color:var(--ink-faint);
+  margin-top:10px;
+}
+
+/* ---- result screen ---- */
+.result-head{margin-bottom:22px;}
+.result-head .k{
+  font-size:0.78rem;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:700;
+  margin-bottom:8px;
+}
+.chart-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px 18px 12px;
+  margin-bottom:22px;
+}
+.chart-card svg{width:100%;height:auto;display:block;}
+.summary-box{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px 18px;
+  font-size:0.85rem;
+  color:var(--ink-soft);
+  white-space:pre-wrap;
+  max-height:220px;
+  overflow-y:auto;
+  margin-bottom:16px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  line-height:1.65;
+}
+.copy-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+.copied-flag{
+  font-size:0.82rem;
+  color:var(--accent);
+  font-weight:600;
+  height:1.2em;
+}
+.next-steps{
+  border-top:1px solid var(--line);
+  padding-top:18px;
+  margin-top:22px;
+  font-size:0.88rem;
+  color:var(--ink-soft);
+}
+.next-steps ol{padding-left:1.2em;margin:8px 0 0;}
+.next-steps li{margin-bottom:6px;}
+</style>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="1.6"/>
+        <path d="M12 3 L12 21 M3 12 L21 12" stroke="var(--accent)" stroke-width="1.2" opacity="0.55"/>
+        <circle cx="12" cy="12" r="2.2" fill="var(--accent)"/>
+      </svg>
+      <span class="name">人生系统<em>3.0</em></span>
+    </div>
+    <div class="progress-row">
+      <div class="progress-track" id="progressTrack"></div>
+      <span class="progress-count tabular" id="progressCount">1 / 10</span>
+    </div>
+  </div>
+
+  <main id="main">
+
+    <!-- step 0: cover -->
+    <section class="step" data-step="0">
+      <h1 class="cover-title">在下一步之前，先看清你现在站的位置。</h1>
+      <p class="cover-lede">这是一份基于 Human 3.0 框架的四象限初诊——不是性格测试，是一次诚实的自我盘点。十分钟，十五个问题，最后会生成一份只属于你的专属摘要。</p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--mind)"></span><div><div class="lt">心智 Mind</div><div class="ld">你如何解释这个世界</div></div></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--body-q)"></span><div><div class="lt">身体 Body</div><div class="ld">这个世界如何回应你</div></div></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--spirit)"></span><div><div class="lt">精神 Spirit</div><div class="ld">意义与联结</div></div></div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--vocation)"></span><div><div class="lt">事业 Vocation</div><div class="ld">你如何贡献于世界</div></div></div>
+      </div>
+      <p class="cover-note">前 12 题请诚实打分，不用想太久，第一反应最准。后面三题需要你写几句真实的话——这部分决定了你拿到的摘要是不是真的在说你。</p>
+    </section>
+
+    <!-- steps 1-4: quadrants -->
+    <section class="step" data-step="1" hidden>
+      <div class="quad-tag"><span class="dot" style="background:var(--mind)"></span>心智 Mind</div>
+      <p class="quad-def">个人心理世界——你如何解释这个世界，你的认知、情绪、思维模式、自我意识。</p>
+
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">自我解释力</span><span class="slider-value tabular" id="v_mind1">5</span></div>
+        <div class="slider-help">遇到反复出现的情绪/反应模式，你能不能说清楚"为什么会这样"</div>
+        <input type="range" id="mind1" min="1" max="10" value="5" data-q="mind" data-i="0">
+        <div class="scale-caps"><span>说不清</span><span>很清楚</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">情绪自主</span><span class="slider-value tabular" id="v_mind2">5</span></div>
+        <div class="slider-help">情绪上来时，你是被情绪带着走，还是知道怎么和它相处</div>
+        <input type="range" id="mind2" min="1" max="10" value="5" data-q="mind" data-i="1">
+        <div class="scale-caps"><span>被带走</span><span>能相处</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">观察者视角</span><span class="slider-value tabular" id="v_mind3">5</span></div>
+        <div class="slider-help">你有多常能跳出来"看见"自己正在做的模式，而不是陷在里面</div>
+        <input type="range" id="mind3" min="1" max="10" value="5" data-q="mind" data-i="2">
+        <div class="scale-caps"><span>很少</span><span>经常</span></div>
+      </div>
+      <div class="field">
+        <label for="noteMind">想再说两句吗？（不强制，但会让报告更准）</label>
+        <textarea id="noteMind" data-note="mind" placeholder="比如具体是哪件事、哪个反应模式……"></textarea>
+      </div>
+    </section>
+
+    <section class="step" data-step="2" hidden>
+      <div class="quad-tag"><span class="dot" style="background:var(--body-q)"></span>身体 Body</div>
+      <p class="quad-def">个人物理世界——这个世界如何"解释"你，你的睡眠、锻炼、饮食、精力。</p>
+
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">睡眠稳定性</span><span class="slider-value tabular" id="v_body1">5</span></div>
+        <div class="slider-help">最近一个月，睡眠规律和质量怎么样</div>
+        <input type="range" id="body1" min="1" max="10" value="5" data-q="body" data-i="0">
+        <div class="scale-caps"><span>很差</span><span>很稳</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">精力设计</span><span class="slider-value tabular" id="v_body2">5</span></div>
+        <div class="slider-help">精力使用是主动安排出来的，还是靠意志力硬撑</div>
+        <input type="range" id="body2" min="1" max="10" value="5" data-q="body" data-i="1">
+        <div class="scale-caps"><span>硬撑</span><span>主动设计</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">信号响应</span><span class="slider-value tabular" id="v_body3">5</span></div>
+        <div class="slider-help">身体发出疲惫/不适信号时，你有没有真的回应它</div>
+        <input type="range" id="body3" min="1" max="10" value="5" data-q="body" data-i="2">
+        <div class="scale-caps"><span>无视</span><span>回应</span></div>
+      </div>
+      <div class="field">
+        <label for="noteBody">想再说两句吗？（不强制，但会让报告更准）</label>
+        <textarea id="noteBody" data-note="body" placeholder="比如最近的作息、身体给过你什么信号……"></textarea>
+      </div>
+    </section>
+
+    <section class="step" data-step="3" hidden>
+      <div class="quad-tag"><span class="dot" style="background:var(--spirit)"></span>精神 Spirit</div>
+      <p class="quad-def">集体心理世界——意义与联结，你的价值观、人际关系、人生方向。</p>
+
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">意义清晰度</span><span class="slider-value tabular" id="v_spirit1">5</span></div>
+        <div class="slider-help">你说不说得清自己为什么而活、为谁而战</div>
+        <input type="range" id="spirit1" min="1" max="10" value="5" data-q="spirit" data-i="0">
+        <div class="scale-caps"><span>说不清</span><span>很清楚</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">关系滋养度</span><span class="slider-value tabular" id="v_spirit2">5</span></div>
+        <div class="slider-help">身边的关系，滋养你的多还是消耗你的多</div>
+        <input type="range" id="spirit2" min="1" max="10" value="5" data-q="spirit" data-i="1">
+        <div class="scale-caps"><span>消耗</span><span>滋养</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">价值观自主性</span><span class="slider-value tabular" id="v_spirit3">5</span></div>
+        <div class="slider-help">你的价值排序，是自己验证过的，还是"应该"这样、借来的</div>
+        <input type="range" id="spirit3" min="1" max="10" value="5" data-q="spirit" data-i="2">
+        <div class="scale-caps"><span>借来的</span><span>自己验证</span></div>
+      </div>
+      <div class="field">
+        <label for="noteSpirit">想再说两句吗？（不强制，但会让报告更准）</label>
+        <textarea id="noteSpirit" data-note="spirit" placeholder="比如哪段关系、哪个价值排序……"></textarea>
+      </div>
+    </section>
+
+    <section class="step" data-step="4" hidden>
+      <div class="quad-tag"><span class="dot" style="background:var(--vocation)"></span>事业 Vocation</div>
+      <p class="quad-def">集体物理世界——你如何融入并贡献于社会，你的工作、收入、影响力、成就。</p>
+
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">表达一致性</span><span class="slider-value tabular" id="v_vocation1">5</span></div>
+        <div class="slider-help">现在做的事和你内心真正关心的东西，重合度有多少</div>
+        <input type="range" id="vocation1" min="1" max="10" value="5" data-q="vocation" data-i="0">
+        <div class="scale-caps"><span>不重合</span><span>高度重合</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">结果匹配度</span><span class="slider-value tabular" id="v_vocation2">5</span></div>
+        <div class="slider-help">收入/影响力和你的真实能力，是否匹配</div>
+        <input type="range" id="vocation2" min="1" max="10" value="5" data-q="vocation" data-i="1">
+        <div class="scale-caps"><span>不匹配</span><span>匹配</span></div>
+      </div>
+      <div class="slider-group">
+        <div class="slider-label-row"><span class="slider-label">内驱力性质</span><span class="slider-value tabular" id="v_vocation3">5</span></div>
+        <div class="slider-help">驱动你做这件事的，更多是"要证明"，还是"想贡献、自然流出"</div>
+        <input type="range" id="vocation3" min="1" max="10" value="5" data-q="vocation" data-i="2">
+        <div class="scale-caps"><span>要证明</span><span>自然流出</span></div>
+      </div>
+      <div class="field">
+        <label for="noteVocation">想再说两句吗？（不强制，但会让报告更准）</label>
+        <textarea id="noteVocation" data-note="vocation" placeholder="比如具体在做什么、卡在哪……"></textarea>
+      </div>
+    </section>
+
+    <!-- step 5: q13 -->
+    <section class="step" data-step="5" hidden>
+      <div class="eyebrow">深挖 · 1 / 3</div>
+      <h2 class="q-title">最近让你觉得"不对劲"，但说不清哪里不对的，是哪一件具体的事？</h2>
+      <p class="q-help">不用归类到某个象限，想到什么写什么，越具体越好。</p>
+      <div class="field">
+        <textarea id="q13" placeholder="比如某个瞬间、某句话、某个反复出现的念头……"></textarea>
+      </div>
+    </section>
+
+    <!-- step 6: dynamic -->
+    <section class="step" data-step="6" hidden>
+      <div class="eyebrow">深挖 · 2 / 3</div>
+      <h2 class="q-title">根据你刚才的作答，有一个问题想问你</h2>
+      <p class="q-help">这道题是从你自己的分数和描述里生成的，只属于你这一次。</p>
+      <div class="dynamic-card">
+        <div class="dc-eyebrow">专属追问</div>
+        <p id="dynamicQuestionText">正在生成……</p>
+      </div>
+      <div class="field">
+        <textarea id="q14" placeholder="写下你的第一反应就好，不用组织语言"></textarea>
+      </div>
+    </section>
+
+    <!-- step 7: q15 -->
+    <section class="step" data-step="7" hidden>
+      <div class="eyebrow">深挖 · 3 / 3</div>
+      <h2 class="q-title">如果这件事真的往好的方向走了，半年后的一天，你大概在做什么？</h2>
+      <p class="q-help">不用合理，越具体越有画面感越好——几点起床、在哪、身边有谁、在做哪件小事。</p>
+      <div class="field">
+        <textarea id="q15" placeholder="描述那一天的一个具体片刻……"></textarea>
+      </div>
+    </section>
+
+    <!-- step 8: contact -->
+    <section class="step" data-step="8" hidden>
+      <div class="eyebrow">最后一步</div>
+      <h2 class="q-title">留下联系方式，接收你的专属报告</h2>
+      <p class="q-help">测评摘要生成后，把它发回你和我聊天的微信窗口，24 小时内你会收到完整的 Human 3.0 人生报告。</p>
+      <div class="field">
+        <label for="cname">怎么称呼你</label>
+        <input type="text" id="cname" placeholder="姓名或昵称">
+      </div>
+      <div class="field">
+        <label for="cwechat">微信号</label>
+        <input type="text" id="cwechat" placeholder="方便核对是同一个人">
+      </div>
+    </section>
+
+    <!-- step 9: result -->
+    <section class="step" data-step="9" hidden>
+      <div class="result-head">
+        <div class="k">初诊完成</div>
+        <h2 class="q-title">这是你此刻的四象限概览</h2>
+        <p class="q-help">柱子的高度是各象限的平均分，虚线是你四项的整体均值。完整的分阶段判断和进化指南，在你的专属报告里。</p>
+      </div>
+
+      <div class="chart-card">
+        <svg id="resultChart" viewBox="0 0 320 190" role="img" aria-label="四象限平均分柱状图"></svg>
+      </div>
+
+      <div class="summary-box tabular" id="summaryBox"></div>
+
+      <div class="copy-row">
+        <button class="btn btn-primary" id="copyBtn">复制测评摘要</button>
+      </div>
+      <div class="copied-flag" id="copiedFlag"></div>
+
+      <div class="next-steps">
+        <strong>接下来：</strong>
+        <ol>
+          <li>点击上面的按钮，复制这份摘要</li>
+          <li>回到和我聊天的微信窗口，粘贴发送给我</li>
+          <li>我会在 24 小时内把你的专属 Human 3.0 人生报告发给你</li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="navbar" id="navbar">
+    <button class="btn btn-ghost" id="backBtn" hidden>上一步</button>
+    <button class="btn btn-primary" id="nextBtn">开始初诊</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TOTAL_STEPS = 10;
+  var state = {
+    step: 0,
+    scores: {
+      mind:[5,5,5], body:[5,5,5], spirit:[5,5,5], vocation:[5,5,5]
+    },
+    q13:'', q14:'', q15:'', name:'', wechat:'',
+    dynamicQuestion:'',
+    notes: { mind:'', body:'', spirit:'', vocation:'' }
+  };
+
+  var quadMeta = {
+    mind:{name:'心智 Mind', short:'心智', subs:['自我解释力','情绪自主','观察者视角']},
+    body:{name:'身体 Body', short:'身体', subs:['睡眠稳定性','精力设计','信号响应']},
+    spirit:{name:'精神 Spirit', short:'精神', subs:['意义清晰度','关系滋养度','价值观自主性']},
+    vocation:{name:'事业 Vocation', short:'事业', subs:['表达一致性','结果匹配度','内驱力性质']}
+  };
+  var quadColorVar = {mind:'--mind', body:'--body-q', spirit:'--spirit', vocation:'--vocation'};
+
+  var main = document.getElementById('main');
+  var steps = Array.prototype.slice.call(main.querySelectorAll('.step'));
+  var backBtn = document.getElementById('backBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var navbar = document.getElementById('navbar');
+  var progressTrack = document.getElementById('progressTrack');
+  var progressCount = document.getElementById('progressCount');
+
+  for (var s=0; s<TOTAL_STEPS; s++){
+    var seg = document.createElement('div');
+    seg.className = 'progress-seg';
+    seg.dataset.seg = s;
+    progressTrack.appendChild(seg);
+  }
+  var segs = Array.prototype.slice.call(progressTrack.children);
+
+  // wire sliders
+  Array.prototype.forEach.call(document.querySelectorAll('input[type="range"]'), function(el){
+    el.addEventListener('input', function(){
+      var q = el.dataset.q, i = +el.dataset.i, val = +el.value;
+      state.scores[q][i] = val;
+      var out = document.getElementById('v_'+q+(i+1));
+      if(out) out.textContent = val;
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('textarea[data-note]'), function(el){
+    el.addEventListener('input', function(){
+      state.notes[el.dataset.note] = el.value;
+    });
+  });
+
+  var q13El = document.getElementById('q13');
+  var q14El = document.getElementById('q14');
+  var q15El = document.getElementById('q15');
+  var cnameEl = document.getElementById('cname');
+  var cwechatEl = document.getElementById('cwechat');
+
+  q13El.addEventListener('input', function(){ state.q13 = q13El.value; updateNextEnabled(); });
+  q14El.addEventListener('input', function(){ state.q14 = q14El.value; updateNextEnabled(); });
+  q15El.addEventListener('input', function(){ state.q15 = q15El.value; updateNextEnabled(); });
+  cnameEl.addEventListener('input', function(){ state.name = cnameEl.value; updateNextEnabled(); });
+  cwechatEl.addEventListener('input', function(){ state.wechat = cwechatEl.value; updateNextEnabled(); });
+
+  function buildDynamicQuestion(){
+    var quads = ['mind','body','spirit','vocation'];
+    var best = null;
+    quads.forEach(function(q){
+      var vals = state.scores[q];
+      var hi=0, lo=0;
+      vals.forEach(function(v,i){ if(v>vals[hi]) hi=i; if(v<vals[lo]) lo=i; });
+      var spread = vals[hi]-vals[lo];
+      if(!best || spread>best.spread) best = {quad:q, spread:spread, hi:hi, lo:lo};
+    });
+
+    var lead = '';
+    var notev = (state.notes[best.quad]||'').trim();
+    var q13v = (state.q13||'').trim();
+    var leadSource = notev || q13v;
+    if(leadSource){
+      var snippet = leadSource.length>36 ? leadSource.slice(0,36)+'…' : leadSource;
+      lead = '你提到"'+snippet+'"。';
+    }
+
+    var text;
+    if(best.spread >= 3){
+      var m = quadMeta[best.quad];
+      var hiLabel = m.subs[best.hi], loLabel = m.subs[best.lo];
+      var hiVal = state.scores[best.quad][best.hi], loVal = state.scores[best.quad][best.lo];
+      text = lead+'你在'+m.name+'这块，"'+hiLabel+'"打了'+hiVal+'分，"'+loLabel+'"只有'+loVal+'分——这两件事，在你心里是怎么共存的？';
+    } else {
+      var avgs = quads.map(function(q){
+        var v = state.scores[q];
+        return {q:q, avg:(v[0]+v[1]+v[2])/3};
+      });
+      avgs.sort(function(a,b){ return b.avg-a.avg; });
+      var highQ = quadMeta[avgs[0].q].name, lowQ = quadMeta[avgs[3].q].name;
+      text = lead+highQ+'这块你打分很扎实，但'+lowQ+'明显在拖后腿——如果这两块可以对话，'+highQ+'会想问'+lowQ+'什么？';
+    }
+    return text;
+  }
+
+  function quadAvg(q){
+    var v = state.scores[q];
+    return (v[0]+v[1]+v[2])/3;
+  }
+
+  function renderChart(){
+    var svg = document.getElementById('resultChart');
+    var quads = ['mind','body','spirit','vocation'];
+    var w=320,h=190, padB=34, padT=18, chartH = h-padB-padT;
+    var barW=44, gap=(w-barW*4)/5;
+    var avgs = quads.map(quadAvg);
+    var overall = (avgs[0]+avgs[1]+avgs[2]+avgs[3])/4;
+
+    var svgns='http://www.w3.org/2000/svg';
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+    var baseline = document.createElementNS(svgns,'line');
+    baseline.setAttribute('x1',0); baseline.setAttribute('x2',w);
+    baseline.setAttribute('y1',padT+chartH); baseline.setAttribute('y2',padT+chartH);
+    baseline.setAttribute('stroke','var(--line)'); baseline.setAttribute('stroke-width','1');
+    svg.appendChild(baseline);
+
+    var refY = padT + chartH - (overall/10)*chartH;
+    var refLine = document.createElementNS(svgns,'line');
+    refLine.setAttribute('x1',4); refLine.setAttribute('x2',w-4);
+    refLine.setAttribute('y1',refY); refLine.setAttribute('y2',refY);
+    refLine.setAttribute('stroke','var(--ink-faint)');
+    refLine.setAttribute('stroke-width','1');
+    refLine.setAttribute('stroke-dasharray','3,4');
+    svg.appendChild(refLine);
+
+    var refLabel = document.createElementNS(svgns,'text');
+    refLabel.setAttribute('x', w-4); refLabel.setAttribute('y', refY-6);
+    refLabel.setAttribute('text-anchor','end');
+    refLabel.setAttribute('font-size','9');
+    refLabel.setAttribute('fill','var(--ink-faint)');
+    refLabel.textContent = '整体均值 '+overall.toFixed(1);
+    svg.appendChild(refLabel);
+
+    quads.forEach(function(q,idx){
+      var x = gap + idx*(barW+gap);
+      var val = avgs[idx];
+      var barH = (val/10)*chartH;
+      var y = padT + chartH - barH;
+
+      var rect = document.createElementNS(svgns,'rect');
+      rect.setAttribute('x',x); rect.setAttribute('y',y);
+      rect.setAttribute('width',barW); rect.setAttribute('height',Math.max(barH,2));
+      rect.setAttribute('rx',4);
+      rect.setAttribute('fill','var('+quadColorVar[q]+')');
+      svg.appendChild(rect);
+
+      var valText = document.createElementNS(svgns,'text');
+      valText.setAttribute('x', x+barW/2); valText.setAttribute('y', y-8);
+      valText.setAttribute('text-anchor','middle');
+      valText.setAttribute('font-size','12');
+      valText.setAttribute('font-weight','700');
+      valText.setAttribute('fill','var(--ink)');
+      valText.textContent = val.toFixed(1);
+      svg.appendChild(valText);
+
+      var label = document.createElementNS(svgns,'text');
+      label.setAttribute('x', x+barW/2); label.setAttribute('y', padT+chartH+18);
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('font-size','11');
+      label.setAttribute('fill','var(--ink-soft)');
+      label.textContent = quadMeta[q].short;
+      svg.appendChild(label);
+    });
+  }
+
+  function buildSummaryText(){
+    var lines = [];
+    lines.push('【人生系统3.0 初诊摘要】');
+    lines.push('姓名：'+(state.name||'—'));
+    lines.push('微信：'+(state.wechat||'—'));
+    lines.push('');
+    ['mind','body','spirit','vocation'].forEach(function(q){
+      lines.push('—— '+quadMeta[q].name+' ——');
+      quadMeta[q].subs.forEach(function(label,i){
+        lines.push(label+'：'+state.scores[q][i]);
+      });
+      if((state.notes[q]||'').trim()){
+        lines.push('说明：'+state.notes[q].trim());
+      }
+      lines.push('');
+    });
+    lines.push('13. 最近不对劲的事：'+(state.q13||'—'));
+    lines.push('14. '+state.dynamicQuestion);
+    lines.push('    回答：'+(state.q14||'—'));
+    lines.push('15. 半年后的画面：'+(state.q15||'—'));
+    return lines.join('\n');
+  }
+
+  function updateProgress(){
+    segs.forEach(function(seg,i){
+      if(i<=state.step) seg.classList.add('done'); else seg.classList.remove('done');
+    });
+    progressCount.textContent = (state.step+1)+' / '+TOTAL_STEPS;
+  }
+
+  function currentStepValid(){
+    if(state.step===5) return state.q13.trim().length>0;
+    if(state.step===6) return state.q14.trim().length>0;
+    if(state.step===7) return state.q15.trim().length>0;
+    if(state.step===8) return state.name.trim().length>0 && state.wechat.trim().length>0;
+    return true;
+  }
+
+  function updateNextEnabled(){
+    nextBtn.disabled = !currentStepValid();
+  }
+
+  function goToStep(n){
+    steps.forEach(function(sec){
+      sec.hidden = (+sec.dataset.step !== n);
+    });
+    state.step = n;
+    backBtn.hidden = (n===0);
+    if(n===0){
+      nextBtn.textContent = '开始初诊';
+    } else if(n===8){
+      nextBtn.textContent = '生成我的测评摘要';
+    } else if(n<9){
+      nextBtn.textContent = '下一步';
+    }
+    navbar.hidden = (n===9);
+    if(n===6){
+      state.dynamicQuestion = buildDynamicQuestion();
+      document.getElementById('dynamicQuestionText').textContent = state.dynamicQuestion;
+    }
+    if(n===9){
+      renderChart();
+      document.getElementById('summaryBox').textContent = buildSummaryText();
+    }
+    updateProgress();
+    updateNextEnabled();
+    window.scrollTo(0,0);
+  }
+
+  nextBtn.addEventListener('click', function(){
+    if(!currentStepValid()) return;
+    if(state.step < TOTAL_STEPS-1) goToStep(state.step+1);
+  });
+  backBtn.addEventListener('click', function(){
+    if(state.step>0) goToStep(state.step-1);
+  });
+
+  var copyBtn = document.getElementById('copyBtn');
+  var copiedFlag = document.getElementById('copiedFlag');
+  copyBtn.addEventListener('click', function(){
+    var text = buildSummaryText();
+    function showCopied(){
+      copiedFlag.textContent = '已复制，去微信里粘贴发送吧';
+      setTimeout(function(){ copiedFlag.textContent=''; }, 4000);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopied).catch(function(){
+        selectSummaryFallback();
+      });
+    } else {
+      selectSummaryFallback();
+    }
+  });
+  function selectSummaryFallback(){
+    var box = document.getElementById('summaryBox');
+    var range = document.createRange();
+    range.selectNodeContents(box);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    copiedFlag.textContent = '已为你选中文字，长按/Ctrl+C 复制即可';
+  }
+
+  goToStep(0);
+})();
+</script>
