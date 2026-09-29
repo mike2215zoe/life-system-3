@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>人生系统3.0 · 初诊</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
 <style>
@@ -392,6 +394,10 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
 }
 .next-steps ol{padding-left:1.2em;margin:8px 0 0;}
 .next-steps li{margin-bottom:6px;}
+.submit-status{font-size:0.95rem;font-weight:600;padding:14px 16px;border-radius:10px;margin-bottom:6px;}
+.submit-status.ing{background:var(--surface-2);color:var(--ink-soft);}
+.submit-status.ok{background:var(--accent-soft);color:var(--accent);}
+.submit-status.fail{background:var(--surface-2);color:var(--vocation);}
 </style>
 
 <div class="shell">
@@ -415,7 +421,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     <!-- step 0: cover -->
     <section class="step" data-step="0">
       <h1 class="cover-title">在下一步之前，先看清你现在站的位置。</h1>
-      <p class="cover-lede">这是一份基于 Human 3.0 框架的四象限初诊——不是性格测试，是一次诚实的自我盘点。十分钟，十五个问题，最后会生成一份只属于你的专属摘要。</p>
+      <p class="cover-lede">这是一份基于人生系统 3.0 框架的四象限初诊——不是性格测试，是一次诚实的自我盘点。十分钟，十五个问题，最后会生成一份只属于你的专属摘要。</p>
       <div class="legend">
         <div class="legend-item"><span class="legend-dot" style="background:var(--mind)"></span><div><div class="lt">心智 Mind</div><div class="ld">你如何解释这个世界</div></div></div>
         <div class="legend-item"><span class="legend-dot" style="background:var(--body-q)"></span><div><div class="lt">身体 Body</div><div class="ld">这个世界如何回应你</div></div></div>
@@ -576,7 +582,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     <section class="step" data-step="8" hidden>
       <div class="eyebrow">最后一步</div>
       <h2 class="q-title">留下联系方式，接收你的专属报告</h2>
-      <p class="q-help">测评摘要生成后，把它发回你和我聊天的微信窗口，24 小时内你会收到完整的 Human 3.0 人生报告。</p>
+      <p class="q-help">点击提交后，你的测评会直接送到我这里。提交完在微信里告诉我一声"做完了"，24 小时内你会收到完整的人生系统 3.0 报告。</p>
       <div class="field">
         <label for="cname">怎么称呼你</label>
         <input type="text" id="cname" placeholder="姓名或昵称">
@@ -599,20 +605,26 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
         <svg id="resultChart" viewBox="0 0 320 190" role="img" aria-label="四象限平均分柱状图"></svg>
       </div>
 
-      <div class="summary-box tabular" id="summaryBox"></div>
+      <div class="submit-status" id="submitStatus"></div>
 
-      <div class="copy-row">
-        <button class="btn btn-primary" id="copyBtn">复制测评摘要</button>
-      </div>
-      <div class="copied-flag" id="copiedFlag"></div>
-
-      <div class="next-steps">
+      <div class="next-steps" id="nextOk" hidden>
         <strong>接下来：</strong>
         <ol>
-          <li>点击上面的按钮，复制这份摘要</li>
-          <li>回到和我聊天的微信窗口，粘贴发送给我</li>
-          <li>我会在 24 小时内把你的专属 Human 3.0 人生报告发给你</li>
+          <li>回到和我聊天的微信窗口，告诉我一声"做完了"</li>
+          <li>我会在 24 小时内把你的专属人生系统 3.0 报告发给你</li>
         </ol>
+        <p class="hint-block">不需要截图，也不需要复制，你的答案我这边已经收到了。</p>
+        <p class="hint-block"><a href="#" id="restartLink" style="color:var(--ink-faint)">帮另一个人重新做一份</a></p>
+      </div>
+
+      <div id="fallback" hidden>
+        <p class="q-help">提交没有成功（可能是网络问题）。你可以点"重新提交"，或者复制下面的摘要发到微信给我，答案都不会丢。</p>
+        <div class="copy-row">
+          <button class="btn btn-primary" id="retryBtn">重新提交</button>
+          <button class="btn btn-ghost" id="copyBtn">复制测评摘要</button>
+        </div>
+        <div class="copied-flag" id="copiedFlag"></div>
+        <div class="summary-box tabular" id="summaryBox"></div>
       </div>
     </section>
 
@@ -849,7 +861,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     if(n===0){
       nextBtn.textContent = '开始初诊';
     } else if(n===8){
-      nextBtn.textContent = '生成我的测评摘要';
+      nextBtn.textContent = '提交我的测评';
     } else if(n<9){
       nextBtn.textContent = '下一步';
     }
@@ -861,6 +873,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     if(n===9){
       renderChart();
       document.getElementById('summaryBox').textContent = buildSummaryText();
+      submitData();
     }
     updateProgress();
     updateNextEnabled();
@@ -901,6 +914,61 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     copiedFlag.textContent = '已为你选中文字，长按/Ctrl+C 复制即可';
   }
 
-  goToStep(0);
+  // ---- 提交到飞书 ----
+  var WEBHOOK = 'https://open.feishu.cn/open-apis/bot/v2/hook/d921b589-c31b-4e33-8a49-f835e21c2b9d';
+  var STORE = 'ls3_state_v1';
+  var statusEl = document.getElementById('submitStatus');
+  function setStatus(cls, text){ statusEl.className = 'submit-status '+cls; statusEl.textContent = text; }
+  function submitData(){
+    if(state.submitted){ showOk(); return; }
+    if(!state.sid) state.sid = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    setStatus('ing','正在提交…');
+    document.getElementById('fallback').hidden = true;
+    var raw = {sid:state.sid, name:state.name, wechat:state.wechat, scores:state.scores, notes:state.notes,
+      q13:state.q13, q14q:state.dynamicQuestion, q14:state.q14, q15:state.q15, ts:new Date().toISOString()};
+    var text = '📥 无极 · 新的初诊提交\n\n'+buildSummaryText()+'\n\n#DATA#'+JSON.stringify(raw);
+    fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({msg_type:'text',content:{text:text}})})
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(j && (j.code===0 || j.StatusCode===0)){ state.submitted = true; save(); showOk(); }
+        else throw new Error(j && j.msg);
+      })
+      .catch(function(){
+        setStatus('fail','提交没有成功');
+        document.getElementById('fallback').hidden = false;
+      });
+  }
+  function showOk(){
+    setStatus('ok','✓ 已提交成功，'+(state.name||'')+'，你的答案我已经收到了');
+    document.getElementById('nextOk').hidden = false;
+    document.getElementById('fallback').hidden = true;
+  }
+  document.getElementById('retryBtn').addEventListener('click', submitData);
+  document.getElementById('restartLink').addEventListener('click', function(e){
+    e.preventDefault(); try{ localStorage.removeItem(STORE); }catch(x){} location.reload();
+  });
+
+  // ---- 进度保存：刷新或退出后回来接着做 ----
+  function save(){ try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){} }
+  function restore(){
+    try{
+      var saved = JSON.parse(localStorage.getItem(STORE)||'null');
+      if(!saved) return 0;
+      for(var k in saved) state[k] = saved[k];
+      Array.prototype.forEach.call(document.querySelectorAll('input[type="range"]'), function(el){
+        var v = state.scores[el.dataset.q][+el.dataset.i]; el.value = v;
+        var out = document.getElementById('v_'+el.dataset.q+(+el.dataset.i+1)); if(out) out.textContent = v;
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('textarea[data-note]'), function(el){ el.value = state.notes[el.dataset.note]||''; });
+      q13El.value=state.q13; q14El.value=state.q14; q15El.value=state.q15; cnameEl.value=state.name; cwechatEl.value=state.wechat;
+      return saved.submitted ? 9 : Math.min(saved.step||0, 8);
+    }catch(e){ return 0; }
+  }
+  main.addEventListener('input', save);
+  nextBtn.addEventListener('click', save);
+  backBtn.addEventListener('click', save);
+
+  goToStep(restore());
 })();
 </script>
