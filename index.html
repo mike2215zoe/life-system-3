@@ -315,6 +315,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
   gap:10px;
   z-index:5;
 }
+.navbar[hidden]{display:none;}
 .btn{
   border:none;
   border-radius:8px;
@@ -602,7 +603,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
       </div>
 
       <div class="chart-card">
-        <svg id="resultChart" viewBox="0 0 320 190" role="img" aria-label="四象限平均分柱状图"></svg>
+        <svg id="resultChart" viewBox="0 -18 320 208" role="img" aria-label="四象限平均分柱状图"></svg>
       </div>
 
       <div class="submit-status" id="submitStatus"></div>
@@ -639,6 +640,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
 <script>
 (function(){
   var TOTAL_STEPS = 10;
+  var submitting = false;
   var state = {
     step: 0,
     scores: {
@@ -770,13 +772,23 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     refLine.setAttribute('stroke-dasharray','3,4');
     svg.appendChild(refLine);
 
+    // 均值标注放在图表上方的图例行（y<0 区域），不会和任何柱子的数值重叠
     var refLabel = document.createElementNS(svgns,'text');
-    refLabel.setAttribute('x', w-4); refLabel.setAttribute('y', refY-6);
+    refLabel.setAttribute('x', w-4); refLabel.setAttribute('y', -8);
     refLabel.setAttribute('text-anchor','end');
     refLabel.setAttribute('font-size','9');
     refLabel.setAttribute('fill','var(--ink-faint)');
     refLabel.textContent = '整体均值 '+overall.toFixed(1);
     svg.appendChild(refLabel);
+    var labelW = 56;
+    try{ var tl = refLabel.getComputedTextLength(); if(tl>0) labelW = tl; }catch(e){}
+    var legendLine = document.createElementNS(svgns,'line');
+    legendLine.setAttribute('x1', w-4-labelW-22); legendLine.setAttribute('x2', w-4-labelW-6);
+    legendLine.setAttribute('y1', -11); legendLine.setAttribute('y2', -11);
+    legendLine.setAttribute('stroke','var(--ink-faint)');
+    legendLine.setAttribute('stroke-width','1');
+    legendLine.setAttribute('stroke-dasharray','3,4');
+    svg.appendChild(legendLine);
 
     quads.forEach(function(q,idx){
       var x = gap + idx*(barW+gap);
@@ -853,6 +865,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
   }
 
   function goToStep(n){
+    if(state.submitted || submitting) n = 9; // 已提交或提交中：锁定在结果页，不能回退再提交
     steps.forEach(function(sec){
       sec.hidden = (+sec.dataset.step !== n);
     });
@@ -866,6 +879,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
       nextBtn.textContent = '下一步';
     }
     navbar.hidden = (n===9);
+    if(n===9){ nextBtn.disabled = true; backBtn.disabled = true; }
     if(n===6){
       state.dynamicQuestion = buildDynamicQuestion();
       document.getElementById('dynamicQuestionText').textContent = state.dynamicQuestion;
@@ -876,15 +890,17 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
       submitData();
     }
     updateProgress();
-    updateNextEnabled();
+    if(n!==9) updateNextEnabled();
     window.scrollTo(0,0);
   }
 
   nextBtn.addEventListener('click', function(){
+    if(state.step===9 || state.submitted || submitting) return;
     if(!currentStepValid()) return;
     if(state.step < TOTAL_STEPS-1) goToStep(state.step+1);
   });
   backBtn.addEventListener('click', function(){
+    if(state.step===9 || state.submitted || submitting) return;
     if(state.step>0) goToStep(state.step-1);
   });
 
@@ -918,10 +934,14 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
   var WEBHOOK = 'https://open.feishu.cn/open-apis/bot/v2/hook/d921b589-c31b-4e33-8a49-f835e21c2b9d';
   var STORE = 'ls3_state_v1';
   var statusEl = document.getElementById('submitStatus');
+  var retryBtn = document.getElementById('retryBtn');
   function setStatus(cls, text){ statusEl.className = 'submit-status '+cls; statusEl.textContent = text; }
   function submitData(){
     if(state.submitted){ showOk(); return; }
-    if(!state.sid) state.sid = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    if(submitting) return; // 防止同一份答案并发重复发送
+    submitting = true;
+    retryBtn.disabled = true;
+    if(!state.sid){ state.sid = Date.now().toString(36)+Math.random().toString(36).slice(2,6); save(); }
     setStatus('ing','正在提交…');
     document.getElementById('fallback').hidden = true;
     var raw = {sid:state.sid, name:state.name, wechat:state.wechat, scores:state.scores, notes:state.notes,
@@ -931,10 +951,12 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
       body:JSON.stringify({msg_type:'text',content:{text:text}})})
       .then(function(r){ return r.json(); })
       .then(function(j){
-        if(j && (j.code===0 || j.StatusCode===0)){ state.submitted = true; save(); showOk(); }
+        if(j && (j.code===0 || j.StatusCode===0)){ submitting = false; state.submitted = true; save(); showOk(); }
         else throw new Error(j && j.msg);
       })
       .catch(function(){
+        submitting = false;
+        retryBtn.disabled = false; // 真的失败了才允许重新提交
         setStatus('fail','提交没有成功');
         document.getElementById('fallback').hidden = false;
       });
@@ -944,7 +966,7 @@ textarea::placeholder,input::placeholder{color:var(--ink-faint);}
     document.getElementById('nextOk').hidden = false;
     document.getElementById('fallback').hidden = true;
   }
-  document.getElementById('retryBtn').addEventListener('click', submitData);
+  retryBtn.addEventListener('click', submitData);
   document.getElementById('restartLink').addEventListener('click', function(e){
     e.preventDefault(); try{ localStorage.removeItem(STORE); }catch(x){} location.reload();
   });
